@@ -75,7 +75,6 @@ class AirportRepository:
         )
         return cls(manager)
 
-    # --- Gates ---
 
     def add_gate(self, gate: Gate) -> Gate:
         query = "INSERT INTO gates (gate_number, terminal) VALUES (?, ?);"
@@ -103,7 +102,6 @@ class AirportRepository:
                 Gate(id=r["id"], gate_number=r["gate_number"], terminal=r["terminal"]) for r in rows
             ]
 
-    # --- Flights ---
 
     def add_flight(self, flight: Flight) -> Flight:
         query = """
@@ -253,7 +251,6 @@ class AirportRepository:
                 for r in rows
             ]
 
-    # --- Passengers ---
 
     def add_passenger(self, passenger: Passenger) -> Passenger:
         query = """

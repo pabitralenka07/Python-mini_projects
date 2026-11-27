@@ -20,7 +20,7 @@ class SnakeModel:
 
     def reset(self):
         cx, cy = self.cols // 2, self.rows // 2
-        self.snake = [(cx, cy), (cx - 1, cy), (cx - 2, cy)]  # head first
+        self.snake = [(cx, cy), (cx - 1, cy), (cx - 2, cy)]
         self.direction = self.pending = (1, 0)
         self.score, self.alive = 0, True
         self.food = self._place_food()
@@ -31,7 +31,7 @@ class SnakeModel:
         return self.rng.choice(free) if free else None
 
     def turn(self, d):
-        if (d[0] + self.direction[0], d[1] + self.direction[1]) != (0, 0):  # no 180-degree reversal
+        if (d[0] + self.direction[0], d[1] + self.direction[1]) != (0, 0):
             self.pending = d
 
     def step(self):
@@ -40,7 +40,7 @@ class SnakeModel:
         self.direction = self.pending
         nx, ny = self.snake[0][0] + self.direction[0], self.snake[0][1] + self.direction[1]
         eating = (nx, ny) == self.food
-        body = self.snake if eating else self.snake[:-1]  # the tail cell is free unless we grow
+        body = self.snake if eating else self.snake[:-1]
         if not (0 <= nx < self.cols and 0 <= ny < self.rows) or (nx, ny) in body:
             self.alive = False
             return
@@ -48,7 +48,7 @@ class SnakeModel:
         if eating:
             self.score += 10
             self.food = self._place_food()
-            if self.food is None:  # board full: you win
+            if self.food is None:
                 self.alive = False
         else:
             self.snake.pop()

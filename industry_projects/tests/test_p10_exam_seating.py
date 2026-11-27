@@ -38,11 +38,9 @@ def test_capacity_exceeded_error(
     exam_setup: tuple[ExamRepository, ExamSeatingService],
 ) -> None:
     _, service = exam_setup
-    # Room with capacity 4
     service.register_room("TINY-ROOM", rows=2, cols=2)
     service.schedule_exam("CS101", "Intro CS", "2026-12-15", "MORNING")
 
-    # Enroll 5 students (capacity is 4)
     for i in range(1, 6):
         service.register_student(f"CS-00{i}", f"Student {i}", "CS101")
 
@@ -65,7 +63,7 @@ def test_deterministic_alternating_course_allocation(
     exam_setup: tuple[ExamRepository, ExamSeatingService],
 ) -> None:
     repo, service = exam_setup
-    room = service.register_room("MAIN-HALL", rows=2, cols=4)  # 8 seats
+    room = service.register_room("MAIN-HALL", rows=2, cols=4)
     assert room.id is not None
 
     e1 = service.schedule_exam("CS101", "Computer Science", "2026-12-10", "MORNING")
@@ -73,7 +71,6 @@ def test_deterministic_alternating_course_allocation(
     assert e1.id is not None
     assert e2.id is not None
 
-    # Enroll 4 CS and 4 MA students
     for i in range(1, 5):
         service.register_student(f"CS-0{i}", f"CS Student {i}", "CS101")
         service.register_student(f"MA-0{i}", f"MA Student {i}", "MA201")
@@ -81,12 +78,10 @@ def test_deterministic_alternating_course_allocation(
     count = service.allocate_exam_session("2026-12-10", "MORNING", seed=42)
     assert count == 8
 
-    # Query room allocation
     allocations = repo.get_allocations_for_room(room.id, [e1.id, e2.id])
     assert len(allocations) == 8
 
     alloc_map = {a.seat_label: a for a in allocations}
-    # Check that adjacent seats alternate courses: R1C1 and R1C2 must have different courses!
     assert alloc_map["R1C1"].course_code != alloc_map["R1C2"].course_code
     assert alloc_map["R1C2"].course_code != alloc_map["R1C3"].course_code
     assert alloc_map["R1C3"].course_code != alloc_map["R1C4"].course_code
@@ -108,11 +103,9 @@ def test_reproducibility_with_seed(
         service.register_student(f"BIO-{i}", f"Bio {i}", "BIO101")
         service.register_student(f"CHEM-{i}", f"Chem {i}", "CHEM101")
 
-    # Run 1 with seed 99
     service.allocate_exam_session("2026-12-20", "MORNING", seed=99)
     run1 = repo.get_allocations_for_room(room.id, [e1.id, e2.id])
 
-    # Run 2 with seed 99 (must match run 1 exactly)
     service.allocate_exam_session("2026-12-20", "MORNING", seed=99)
     run2 = repo.get_allocations_for_room(room.id, [e1.id, e2.id])
 
@@ -137,13 +130,11 @@ def test_csv_export_and_chart_rendering(
 
     service.allocate_exam_session("2026-12-22", "MORNING")
 
-    # Test chart format
     chart = service.format_room_chart(room.id, [e.id])
     assert "SEATING CHART: ROOM EXPORT-HALL" in chart
     assert "ENG101 ENG-1" in chart
-    assert "EMPTY" in chart  # 2 students in a 4-seat room
+    assert "EMPTY" in chart
 
-    # Test CSV export
     csv_file = tmp_path / "test_seating.csv"
     exported_path = service.export_allocations_to_csv([e.id], csv_file)
     assert exported_path.exists()
@@ -151,7 +142,7 @@ def test_csv_export_and_chart_rendering(
     with open(exported_path, encoding="utf-8") as f:
         reader = list(csv.reader(f))
         assert reader[0] == ["Room", "Seat", "Course", "RollNumber", "StudentName", "ExamName"]
-        assert len(reader) == 3  # Header + 2 students
+        assert len(reader) == 3
 
 
 def test_cli_handles_eof_gracefully(

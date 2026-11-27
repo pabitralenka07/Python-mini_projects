@@ -61,7 +61,6 @@ class BankRepository:
         )
         return cls(manager)
 
-    # --- Customers ---
 
     def add_customer(self, customer: Customer) -> Customer:
         query = "INSERT INTO customers (name, email, created_at) VALUES (?, ?, ?);"
@@ -118,7 +117,6 @@ class BankRepository:
                 for r in rows
             ]
 
-    # --- Accounts ---
 
     def add_account(self, account: Account) -> None:
         min_bal = getattr(account, "minimum_balance_cents", 0)
@@ -255,7 +253,6 @@ class BankRepository:
         with self.db.get_connection() as conn, conn:
             conn.execute(query, (new_status, account_number))
 
-    # --- Financial Operations & Atomic Transfer ---
 
     def execute_deposit(self, account_number: str, amount_cents: int, timestamp: str) -> int:
         """Atomically credit account and record DEPOSIT transaction."""
@@ -318,7 +315,6 @@ class BankRepository:
         TRANSFER_IN records within a single transaction boundary.
         """
         with self.db.get_connection() as conn, conn:
-            # 1. Debit source
             conn.execute(
                 "UPDATE accounts SET balance_cents = balance_cents - ? WHERE account_number = ?;",
                 (amount_cents, source_acc),
@@ -329,7 +325,6 @@ class BankRepository:
             ).fetchone()
             source_new_bal = int(s_row["balance_cents"])
 
-            # 2. Record source transaction
             conn.execute(
                 """
                 INSERT INTO transactions (
@@ -340,7 +335,6 @@ class BankRepository:
                 (source_acc, amount_cents, source_new_bal, dest_acc, timestamp),
             )
 
-            # 3. Credit destination
             conn.execute(
                 "UPDATE accounts SET balance_cents = balance_cents + ? WHERE account_number = ?;",
                 (amount_cents, dest_acc),
@@ -351,7 +345,6 @@ class BankRepository:
             ).fetchone()
             dest_new_bal = int(d_row["balance_cents"])
 
-            # 4. Record destination transaction
             conn.execute(
                 """
                 INSERT INTO transactions (

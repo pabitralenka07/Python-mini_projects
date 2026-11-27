@@ -37,8 +37,8 @@ class Flight:
     airline: str
     origin: str
     destination: str
-    departure_time: str  # ISO 8601: YYYY-MM-DDTHH:MM:SS
-    arrival_time: str  # ISO 8601: YYYY-MM-DDTHH:MM:SS
+    departure_time: str
+    arrival_time: str
     gate_id: int | None = None
     status: str = FlightStatus.SCHEDULED
     id: int | None = None

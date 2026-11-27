@@ -57,7 +57,6 @@ class LibraryRepository:
         )
         return cls(manager)
 
-    # --- Books ---
 
     def add_book(self, book: Book) -> Book:
         query = """
@@ -173,7 +172,6 @@ class LibraryRepository:
         with self.db.get_connection() as conn, conn:
             conn.execute(query, (book_id,))
 
-    # --- Members ---
 
     def add_member(self, member: Member) -> Member:
         query = """
@@ -258,7 +256,6 @@ class LibraryRepository:
                 for row in rows
             ]
 
-    # --- Loans ---
 
     def create_loan(self, book_id: int, member_id: int, loan_date: str, due_date: str) -> int:
         """Create a loan record and atomically decrement available copies."""

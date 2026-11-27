@@ -83,7 +83,6 @@ class BusRepository:
         )
         return cls(manager)
 
-    # --- Fleet Buses ---
 
     def add_bus(self, bus: Bus) -> Bus:
         query = "INSERT INTO buses (bus_number, bus_type, total_seats) VALUES (?, ?, ?);"
@@ -127,7 +126,6 @@ class BusRepository:
                 for r in rows
             ]
 
-    # --- Routes ---
 
     def add_route(self, route: Route) -> Route:
         query = "INSERT INTO routes (origin, destination, distance_km) VALUES (?, ?, ?);"
@@ -173,7 +171,6 @@ class BusRepository:
                 for r in rows
             ]
 
-    # --- Schedules ---
 
     def add_schedule(self, schedule: Schedule) -> Schedule:
         query = """
@@ -261,7 +258,6 @@ class BusRepository:
                 for r in rows
             ]
 
-    # --- Bookings ---
 
     def create_booking(self, booking: Booking) -> Booking:
         query = """

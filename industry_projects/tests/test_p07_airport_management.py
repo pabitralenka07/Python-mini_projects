@@ -59,19 +59,15 @@ def test_flight_status_state_machine_valid_and_invalid_transitions(
     )
     assert f.id is not None
 
-    # Invalid: Cannot jump straight from SCHEDULED to DEPARTED
     with pytest.raises(InvalidFlightStatusTransitionError, match="Cannot transition"):
         service.update_flight_status(f.id, FlightStatus.DEPARTED)
 
-    # Valid: SCHEDULED -> BOARDING
     service.update_flight_status(f.id, FlightStatus.BOARDING)
     assert service.get_flight(f.id).status == FlightStatus.BOARDING
 
-    # Valid: BOARDING -> DEPARTED
     service.update_flight_status(f.id, FlightStatus.DEPARTED)
     assert service.get_flight(f.id).status == FlightStatus.DEPARTED
 
-    # Invalid: DEPARTED is terminal, cannot transition back to BOARDING or SCHEDULED
     with pytest.raises(InvalidFlightStatusTransitionError):
         service.update_flight_status(f.id, FlightStatus.BOARDING)
 
@@ -94,7 +90,6 @@ def test_gate_overlap_rejection(
     )
     assert f1.id is not None
 
-    # Flight 2 departs at 10:30:00 (only 30 minutes after Flight 1; buffer is 60 mins)
     f2 = service.schedule_flight(
         flight_number="FLIGHT-2",
         airline="Airline 2",
@@ -108,7 +103,6 @@ def test_gate_overlap_rejection(
     with pytest.raises(GateConflictError, match="Gate conflict"):
         service.assign_gate(f2.id, gate.id, turnaround_minutes=60)
 
-    # Flight 3 departs at 11:30:00 (90 minutes after Flight 1; >= 60 min buffer)
     f3 = service.schedule_flight(
         flight_number="FLIGHT-3",
         airline="Airline 3",
@@ -119,7 +113,6 @@ def test_gate_overlap_rejection(
     )
     assert f3.id is not None
 
-    # Assigning gate to Flight 3 should succeed
     service.assign_gate(f3.id, gate.id, turnaround_minutes=60)
     assert service.get_flight(f3.id).gate_id == gate.id
 
@@ -143,18 +136,15 @@ def test_passenger_check_in_and_seat_assignment(
     assert p1.id is not None
     assert p2.id is not None
 
-    # Check in passenger 1 to 14A
     service.check_in(p1.id, "14A")
     updated_p1 = service.repo.get_passenger(p1.id)
     assert updated_p1 is not None
     assert updated_p1.checked_in is True
     assert updated_p1.seat_number == "14A"
 
-    # Passenger 2 cannot take seat 14A on the same flight
     with pytest.raises(SeatAlreadyAssignedError):
         service.check_in(p2.id, "14A")
 
-    # Passenger 2 takes seat 14B succeeds
     service.check_in(p2.id, "14B")
     updated_p2 = service.repo.get_passenger(p2.id)
     assert updated_p2 is not None
@@ -177,11 +167,9 @@ def test_check_in_blocked_on_departed_flight(
     p = service.register_passenger("Late Traveler", "PASSPORT-99", f.id)
     assert p.id is not None
 
-    # Transition flight to BOARDING then DEPARTED
     service.update_flight_status(f.id, FlightStatus.BOARDING)
     service.update_flight_status(f.id, FlightStatus.DEPARTED)
 
-    # Check in should now be blocked
     with pytest.raises(CheckInNotAllowedError, match="Cannot check in"):
         service.check_in(p.id, "1A")
 

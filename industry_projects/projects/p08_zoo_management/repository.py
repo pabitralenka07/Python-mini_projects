@@ -78,7 +78,6 @@ class ZooRepository:
         )
         return cls(manager)
 
-    # --- Enclosures ---
 
     def add_enclosure(self, enc: Enclosure) -> Enclosure:
         query = "INSERT INTO enclosures (name, habitat_type, max_capacity) VALUES (?, ?, ?);"
@@ -151,7 +150,6 @@ class ZooRepository:
                 for r in rows
             ]
 
-    # --- Animals ---
 
     def add_animal(self, animal: Animal) -> Animal:
         query = """
@@ -212,7 +210,6 @@ class ZooRepository:
                 for r in rows
             ]
 
-    # --- Keepers ---
 
     def add_keeper(self, keeper: Keeper) -> Keeper:
         query = "INSERT INTO keepers (name, employee_id, assigned_enclosure_id) VALUES (?, ?, ?);"
@@ -254,7 +251,6 @@ class ZooRepository:
             if cursor.rowcount == 0:
                 raise DatabaseError(f"Keeper ID {keeper_id} not found.")
 
-    # --- Ticket Sales & Revenue Reports ---
 
     def record_ticket_sale(self, sale: TicketSale) -> TicketSale:
         query = """

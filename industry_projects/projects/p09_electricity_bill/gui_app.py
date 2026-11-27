@@ -42,7 +42,6 @@ class ElectricityBillApp:
         with contextlib.suppress(tk.TclError):
             style.theme_use("clam")
 
-        # Color palette
         self.bg_color = "#f8fafc"
         self.card_bg = "#ffffff"
         self.primary_color = "#0284c7"
@@ -83,7 +82,6 @@ class ElectricityBillApp:
         )
 
     def _build_ui(self) -> None:
-        # 1. Header Frame
         header = tk.Frame(self.root, bg=self.header_bg, height=60)
         header.pack(fill=tk.X, side=tk.TOP)
 
@@ -98,26 +96,21 @@ class ElectricityBillApp:
         )
         title.pack(side=tk.LEFT)
 
-        # 2. Main Tabbed Notebook
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=12, pady=8)
 
-        # Tab 1: Billing & Meter Entry
         self.tab_billing = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_billing, text="  Meter Reading & Billing  ")
         self._build_billing_tab()
 
-        # Tab 2: Consumers Directory
         self.tab_consumers = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_consumers, text="  Consumers Directory  ")
         self._build_consumers_tab()
 
-        # Tab 3: Invoice History
         self.tab_invoices = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_invoices, text="  Invoice History & Settle  ")
         self._build_invoices_tab()
 
-        # 3. Status Bar
         self.status_var = tk.StringVar(value="System Ready.")
         status_bar = tk.Label(
             self.root,
@@ -133,13 +126,11 @@ class ElectricityBillApp:
         )
         status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-    # --- Tab 1: Billing & Meter Reading ---
 
     def _build_billing_tab(self) -> None:
         paned = ttk.PanedWindow(self.tab_billing, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
-        # Left Column: Input Form
         left_frame = ttk.LabelFrame(paned, text=" Meter Reading Submission ", padding=10)
         paned.add(left_frame, weight=1)
 
@@ -178,7 +169,6 @@ class ElectricityBillApp:
         )
         btn_generate.grid(row=5, column=0, columnspan=2, pady=12, sticky=tk.EW)
 
-        # Right Column: Itemized Invoice Preview
         right_frame = ttk.LabelFrame(paned, text=" Itemized Invoice Preview ", padding=10)
         paned.add(right_frame, weight=2)
 
@@ -197,13 +187,11 @@ class ElectricityBillApp:
         )
         self.txt_bill_preview.config(state=tk.DISABLED)
 
-    # --- Tab 2: Consumers Directory ---
 
     def _build_consumers_tab(self) -> None:
         paned = ttk.PanedWindow(self.tab_consumers, orient=tk.HORIZONTAL)
         paned.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
-        # Left: Register Consumer Form
         left_frame = ttk.LabelFrame(paned, text=" Register New Consumer ", padding=10)
         paned.add(left_frame, weight=1)
 
@@ -249,7 +237,6 @@ class ElectricityBillApp:
         )
         btn_add_consumer.grid(row=6, column=0, columnspan=2, pady=12, sticky=tk.EW)
 
-        # Right: Treeview of Consumers
         right_frame = ttk.LabelFrame(paned, text=" Registered Consumers ", padding=10)
         paned.add(right_frame, weight=3)
 
@@ -274,7 +261,6 @@ class ElectricityBillApp:
         self.tree_consumers.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
 
-    # --- Tab 3: Invoices History & Settle ---
 
     def _build_invoices_tab(self) -> None:
         toolbar = ttk.Frame(self.tab_invoices, padding=6)
@@ -296,7 +282,6 @@ class ElectricityBillApp:
         )
         btn_refresh.pack(side=tk.LEFT, padx=6)
 
-        # Invoices Treeview
         tree_frame = ttk.Frame(self.tab_invoices, padding=6)
         tree_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -340,7 +325,6 @@ class ElectricityBillApp:
         self.tree_invoices.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
 
-    # --- Event Handlers & Data Refresh ---
 
     def _refresh_all_data(self) -> None:
         self._refresh_consumers()

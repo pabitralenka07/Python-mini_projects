@@ -24,20 +24,17 @@ def format_table(
     string_rows: list[list[str]] = []
     for row in rows:
         str_row = [str(item) if item is not None else "" for item in row]
-        # Pad or truncate row to match num_cols
         if len(str_row) < num_cols:
             str_row.extend([""] * (num_cols - len(str_row)))
         else:
             str_row = str_row[:num_cols]
         string_rows.append(str_row)
 
-    # Determine column widths
     col_widths = [len(h) for h in headers]
     for str_row in string_rows:
         for idx, cell in enumerate(str_row):
             col_widths[idx] = max(col_widths[idx], len(cell))
 
-    # Determine alignment if not provided
     if alignments is None:
         align_list = ["L"] * num_cols
     else:
@@ -50,10 +47,8 @@ def format_table(
             return text.rjust(width)
         return text.ljust(width)
 
-    # Build border line
     sep_line = "+" + "+".join("-" * (w + 2) for w in col_widths) + "+"
 
-    # Header line
     header_line = (
         "| " + " | ".join(pad_cell(h, col_widths[i], "L") for i, h in enumerate(headers)) + " |"
     )

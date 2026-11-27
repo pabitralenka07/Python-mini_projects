@@ -59,7 +59,6 @@ class BusService:
         self.repo = repository
         self.clock = clock if clock is not None else SystemClock()
 
-    # --- Fleet & Schedules ---
 
     def register_bus(self, bus_number: str, bus_type: str, total_seats: int) -> Bus:
         bus = Bus(
@@ -105,7 +104,6 @@ class BusService:
     def list_schedules(self) -> list[ScheduleDetail]:
         return self.repo.list_schedule_details()
 
-    # --- Seat Map Layout ---
 
     def get_seat_layout(self, schedule_id: int) -> str:
         sch = self.repo.get_schedule(schedule_id)
@@ -127,20 +125,18 @@ class BusService:
             "-" * 32,
         ]
 
-        # 4 seats per row (2 left, aisle, 2 right)
         row_seats: list[str] = []
         for seat_num in range(1, bus.total_seats + 1):
             marker = "[ X ]" if seat_num in booked_seats else f"[{seat_num:^3d}]"
             row_seats.append(marker)
 
             if len(row_seats) == 2:
-                row_seats.append("   ")  # Aisle spacer
+                row_seats.append("   ")
 
             if len(row_seats) == 5:
                 lines.append("  " + "".join(row_seats))
                 row_seats = []
 
-        # Any trailing seats in the last row
         if row_seats:
             lines.append("  " + "".join(row_seats))
 
@@ -148,7 +144,6 @@ class BusService:
         lines.append("Legend: [ # ] Available   [ X ] Booked")
         return "\n".join(lines)
 
-    # --- Seat Booking ---
 
     def book_seat(
         self,
@@ -194,7 +189,6 @@ class BusService:
                 f"Seat {seat_number} was just booked by another passenger."
             ) from err
 
-    # --- Ticket Receipt & Non-Overwriting File Generation ---
 
     def get_ticket_receipt(self, booking_id: int) -> TicketReceipt:
         booking = self.repo.get_booking(booking_id)
@@ -258,13 +252,11 @@ class BusService:
             counter += 1
 
         content = self.format_ticket(receipt)
-        # Using exclusive creation flag 'x' guarantees no overwriting
         with open(candidate, "x", encoding="utf-8") as f:
             f.write(content)
 
         return candidate
 
-    # --- Cancellation & Refund Calculation ---
 
     def calculate_refund(self, fare_cents: int, departure_time: str) -> int:
         """Calculates refund based on hours remaining before departure:

@@ -46,7 +46,6 @@ class ExamSeatingService:
     def __init__(self, repository: ExamRepository) -> None:
         self.repo = repository
 
-    # --- Student & Room Registration ---
 
     def register_student(self, roll_number: str, name: str, course_code: str) -> Student:
         st = Student(
@@ -74,7 +73,6 @@ class ExamSeatingService:
         )
         return self.repo.add_exam(ex)
 
-    # --- Deterministic Seating Allocation Algorithm ---
 
     def allocate_exam_session(
         self,
@@ -91,18 +89,15 @@ class ExamSeatingService:
         if not exams:
             raise ExamSeatingError(f"No exams scheduled for {exam_date} ({slot}).")
 
-        # Map course code to exam object
         exam_by_course: dict[str, Exam] = {e.course_code: e for e in exams}
         exam_ids: list[int] = [e.id for e in exams if e.id is not None]
 
-        # Gather students grouped by course
         course_queues: dict[str, list[Student]] = {}
         total_students = 0
         rng = random.Random(seed)
 
         for course_code in exam_by_course:
             students = self.repo.list_students_by_course(course_code)
-            # Deterministic reproducible shuffle
             rng.shuffle(students)
             course_queues[course_code] = students
             total_students += len(students)
@@ -112,7 +107,6 @@ class ExamSeatingService:
                 f"No students found enrolled for exams on {exam_date} ({slot})."
             )
 
-        # Retrieve available rooms
         if room_ids:
             rooms: list[Room] = []
             for rid in room_ids:
@@ -133,7 +127,6 @@ class ExamSeatingService:
                 f"({total_capacity}) across {len(rooms)} room(s)."
             )
 
-        # Interleave students across distinct courses to maximize separation
         interleaved_students: list[Student] = []
         active_courses = [c for c in course_queues if course_queues[c]]
 
@@ -146,7 +139,6 @@ class ExamSeatingService:
                     next_active.append(c)
             active_courses = next_active
 
-        # Assign students to grid slots in rooms
         allocations: list[SeatAllocation] = []
         student_idx = 0
 
@@ -179,13 +171,11 @@ class ExamSeatingService:
             if student_idx >= len(interleaved_students):
                 break
 
-        # Save allocations atomically
         self.repo.clear_allocations_for_exams(exam_ids)
         self.repo.save_seat_allocations(allocations)
 
         return len(allocations)
 
-    # --- Seating Chart Formatting & Export ---
 
     def format_room_chart(self, room_id: int, exam_ids: list[int]) -> str:
         room = self.repo.get_room(room_id)

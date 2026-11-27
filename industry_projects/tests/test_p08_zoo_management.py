@@ -41,19 +41,15 @@ def test_enclosure_capacity_enforcement(
     zoo_setup: tuple[ZooRepository, ZooService, FrozenClock],
 ) -> None:
     _, service, _ = zoo_setup
-    # Create enclosure with max capacity 2
     enc = service.create_enclosure("Small Aviary", "AVIARY", 2)
     assert enc.id is not None
 
-    # Add 1st animal
     a1 = service.add_animal("Tweety", "Canary", 1, "HERBIVORE", enc.id, "08:00")
     assert a1.id is not None
 
-    # Add 2nd animal (reaches max capacity 2)
     a2 = service.add_animal("Iago", "Parrot", 3, "HERBIVORE", enc.id, "08:30")
     assert a2.id is not None
 
-    # Attempting to add 3rd animal must fail with EnclosureCapacityExceededError
     with pytest.raises(EnclosureCapacityExceededError, match="maximum capacity"):
         service.add_animal("Hedwig", "Snowy Owl", 2, "CARNIVORE", enc.id, "19:00")
 
@@ -70,7 +66,6 @@ def test_feeding_schedule_retrieval(
 
     schedule = service.get_feeding_schedule()
     assert len(schedule) == 2
-    # Should be sorted chronologically by feeding time
     assert schedule[0].animal_name == "Zebra"
     assert schedule[0].feeding_time == "09:00"
     assert schedule[1].animal_name == "Lion"
@@ -97,16 +92,12 @@ def test_ticket_sales_and_daily_revenue_calculation(
     zoo_setup: tuple[ZooRepository, ZooService, FrozenClock],
 ) -> None:
     _, service, _ = zoo_setup
-    # ADULT: 2000 cents ($20), CHILD: 1000 cents ($10), SENIOR: 1500 cents ($15)
-    # Sell 2 adults ($40.00 / 4000c)
     s1 = service.sell_tickets(TicketType.ADULT, 2)
     assert s1.total_cents == 4000
 
-    # Sell 3 children ($30.00 / 3000c)
     s2 = service.sell_tickets(TicketType.CHILD, 3)
     assert s2.total_cents == 3000
 
-    # Sell 1 senior ($15.00 / 1500c)
     s3 = service.sell_tickets(TicketType.SENIOR, 1)
     assert s3.total_cents == 1500
 
@@ -115,7 +106,7 @@ def test_ticket_sales_and_daily_revenue_calculation(
     assert report.child_tickets == 3
     assert report.senior_tickets == 1
     assert report.total_tickets == 6
-    assert report.total_revenue_cents == 8500  # $85.00
+    assert report.total_revenue_cents == 8500
 
 
 def test_cli_handles_eof_gracefully(

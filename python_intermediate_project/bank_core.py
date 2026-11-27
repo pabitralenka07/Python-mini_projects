@@ -47,7 +47,6 @@ class Bank:
     def __init__(self, db):
         self.db = db
 
-    # --- accounts ---
     def open_account(self, holder, pin, opening=0.0):
         holder = holder.strip()
         if not holder:
@@ -76,7 +75,6 @@ class Bank:
     def unlock(self, acc_no):
         self.db.execute("UPDATE accounts SET locked=0, failed=0 WHERE acc_no=?", (acc_no,))
 
-    # --- security ---
     def authenticate(self, acc_no, pin):
         row = self.db.one("SELECT * FROM accounts WHERE acc_no=?", (acc_no,))
         if row is None:
@@ -99,7 +97,6 @@ class Bank:
             raise BankError("New PIN must be exactly 4 digits")
         self.db.execute("UPDATE accounts SET pin_hash=? WHERE acc_no=?", (hash_pin(new), acc_no))
 
-    # --- money movement (each public method is ONE atomic transaction) ---
     def _apply(self, acc_no, delta, kind, note):
         row = self.db.conn.execute("SELECT balance FROM accounts WHERE acc_no=?", (acc_no,)).fetchone()
         if row is None:
@@ -132,7 +129,7 @@ class Bank:
         self._check(amount)
         if src == dst:
             raise BankError("Cannot transfer to the same account")
-        with self.db.conn:  # both legs commit together or not at all
+        with self.db.conn:
             new = self._apply(src, -amount, "Transfer Out", f"To {dst}")
             self._apply(dst, amount, "Transfer In", f"From {src}")
             return new

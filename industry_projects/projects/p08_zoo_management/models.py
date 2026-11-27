@@ -12,11 +12,10 @@ class TicketType(StrEnum):
     SENIOR = "SENIOR"
 
 
-# Pinned minor-unit prices for zoo admission tickets
 TICKET_PRICING_CENTS: dict[str, int] = {
-    TicketType.ADULT: 2000,  # $20.00
-    TicketType.CHILD: 1000,  # $10.00
-    TicketType.SENIOR: 1500,  # $15.00
+    TicketType.ADULT: 2000,
+    TicketType.CHILD: 1000,
+    TicketType.SENIOR: 1500,
 }
 
 
@@ -25,7 +24,7 @@ class Enclosure:
     """Represents an animal habitat enclosure with a strict maximum capacity."""
 
     name: str
-    habitat_type: str  # SAVANNAH, AVIARY, ARCTIC, REPTILE, AQUARIUM
+    habitat_type: str
     max_capacity: int
     id: int | None = None
 
@@ -57,9 +56,9 @@ class Animal:
     name: str
     species: str
     age_years: int
-    dietary_category: str  # CARNIVORE, HERBIVORE, OMNIVORE
+    dietary_category: str
     enclosure_id: int
-    feeding_time: str  # e.g. "09:30" or "15:00"
+    feeding_time: str
     id: int | None = None
 
     def __post_init__(self) -> None:
@@ -109,7 +108,7 @@ class TicketSale:
     quantity: int
     unit_price_cents: int
     total_cents: int
-    sold_at: str  # ISO 8601: YYYY-MM-DDTHH:MM:SS
+    sold_at: str
     id: int | None = None
 
     def __post_init__(self) -> None:

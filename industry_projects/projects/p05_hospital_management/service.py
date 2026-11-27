@@ -77,7 +77,6 @@ class HospitalService:
         self.max_admin_attempts = max_admin_attempts
         self.lockout_minutes = lockout_minutes
 
-    # --- Admin Authentication (Simulation) ---
 
     def register_admin(self, username: str, password: str) -> None:
         user_clean = username.strip().lower()
@@ -121,13 +120,11 @@ class HospitalService:
                 rem = self.max_admin_attempts - attempts
                 raise AdminAuthError(f"Incorrect password. {rem} attempt(s) remaining.")
 
-        # Success: reset attempts
         if admin.failed_attempts > 0 or admin.locked_until is not None:
             self.repo.reset_admin_attempts(user_clean)
 
         return admin
 
-    # --- Doctors & Patients ---
 
     def register_doctor(
         self, name: str, specialization: str, consultation_fee_cents: int
@@ -164,7 +161,6 @@ class HospitalService:
         if patient.status == "DISCHARGED":
             raise HospitalError(f"Patient '{patient.name}' is already discharged.")
 
-        # Enforce billing check
         unpaid_count = self.repo.get_unpaid_bills_count_for_patient(patient_id)
         if unpaid_count > 0:
             raise UnpaidBillsDischargeError(
@@ -174,7 +170,6 @@ class HospitalService:
         today = self.clock.today_iso()
         self.repo.discharge_patient(patient_id, today)
 
-    # --- Appointments & Double-Booking Guard ---
 
     def book_appointment(self, doctor_id: int, patient_id: int, slot_datetime: str) -> int:
         doctor = self.repo.get_doctor(doctor_id)
@@ -186,7 +181,6 @@ class HospitalService:
             raise PatientNotFoundError(f"Patient ID {patient_id} not found.")
 
         slot_clean = slot_datetime.strip()
-        # Enforce doctor cannot be double-booked
         existing = self.repo.get_appointment_by_slot(doctor_id, slot_clean)
         if existing:
             raise DoubleBookingError(
@@ -198,7 +192,6 @@ class HospitalService:
     def list_appointments(self) -> list[AppointmentDetail]:
         return self.repo.list_appointments()
 
-    # --- Billing ---
 
     def generate_bill(
         self,

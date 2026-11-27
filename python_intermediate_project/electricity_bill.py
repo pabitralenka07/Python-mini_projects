@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS bills(id INTEGER PRIMARY KEY, customer_id INTEGER NOT
     energy REAL NOT NULL, fixed REAL NOT NULL, tax REAL NOT NULL, total REAL NOT NULL, paid INTEGER NOT NULL DEFAULT 0,
     UNIQUE(customer_id, month));
 """
-# Sample tariff (editable): (slab width in units, rate per unit); None = all remaining units
 TARIFF = {
     "Domestic": {"slabs": [(100, 3.5), (200, 5.0), (None, 7.0)], "fixed": 50.0},
     "Commercial": {"slabs": [(200, 6.0), (None, 8.5)], "fixed": 150.0},

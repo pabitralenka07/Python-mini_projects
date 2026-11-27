@@ -66,7 +66,6 @@ def test_double_booking_prevention(
     assert p1.id is not None
     assert p2.id is not None
 
-    # First booking succeeds
     app1_id = service.book_appointment(
         doctor_id=doc.id,
         patient_id=p1.id,
@@ -74,7 +73,6 @@ def test_double_booking_prevention(
     )
     assert app1_id > 0
 
-    # Second booking at identical doctor and slot must fail with DoubleBookingError
     with pytest.raises(DoubleBookingError, match="already booked for slot"):
         service.book_appointment(
             doctor_id=doc.id,
@@ -82,7 +80,6 @@ def test_double_booking_prevention(
             slot_datetime="2026-11-10 09:00",
         )
 
-    # Booking at a different time slot for the same doctor should succeed
     app2_id = service.book_appointment(
         doctor_id=doc.id,
         patient_id=p2.id,
@@ -98,7 +95,6 @@ def test_discharge_blocked_by_unpaid_bills(
     pat = service.admit_patient("Bob", "1985-07-20", "555-8888")
     assert pat.id is not None
 
-    # Generate unpaid bill
     bill = service.generate_bill(
         patient_id=pat.id,
         room_charge_cents=10000,
@@ -108,14 +104,11 @@ def test_discharge_blocked_by_unpaid_bills(
     assert bill.id is not None
     assert bill.total_cents == 30000
 
-    # Discharge should be blocked
     with pytest.raises(UnpaidBillsDischargeError, match="unpaid bill"):
         service.discharge_patient(pat.id)
 
-    # Settle the bill
     service.settle_bill(bill.id)
 
-    # Now discharge must succeed
     service.discharge_patient(pat.id)
     updated_pat = repo.get_patient(pat.id)
     assert updated_pat is not None
@@ -130,25 +123,20 @@ def test_admin_auth_and_lockout() -> None:
 
     service.register_admin("head_nurse", "securepass123")
 
-    # Wrong password attempt 1 & 2
     with pytest.raises(AdminAuthError, match="Incorrect password"):
         service.authenticate_admin("head_nurse", "wrongpass1")
 
     with pytest.raises(AdminAuthError, match="Incorrect password"):
         service.authenticate_admin("head_nurse", "wrongpass2")
 
-    # Wrong password attempt 3 triggers lockout
     with pytest.raises(AdminAuthError, match="Max failed attempts exceeded"):
         service.authenticate_admin("head_nurse", "wrongpass3")
 
-    # Even right password fails while locked
     with pytest.raises(AdminAuthError, match="locked due to multiple failed attempts"):
         service.authenticate_admin("head_nurse", "securepass123")
 
-    # Advance clock past lockout period (16 minutes)
     clock.advance(16 * 60)
 
-    # Authentication succeeds
     admin = service.authenticate_admin("head_nurse", "securepass123")
     assert admin.username == "head_nurse"
 
@@ -158,5 +146,4 @@ def test_cli_handles_eof_gracefully(
 ) -> None:
     _, service = hospital_setup
     with patch("builtins.input", side_effect=EOFError):
-        # Must exit smoothly without unhandled exception
         run_cli(service)

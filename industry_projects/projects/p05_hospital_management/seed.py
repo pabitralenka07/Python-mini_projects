@@ -19,14 +19,12 @@ def seed_data(repo: HospitalRepository | None = None) -> None:
 
     print("Seeding Hospital Management System...")
 
-    # 1. Admin account
     try:
         service.register_admin("admin", "admin123")
         print(" -> Created admin user 'admin' (password: admin123)")
     except AdminAuthError:
         print(" -> Admin user 'admin' already exists.")
 
-    # 2. Doctors
     existing_docs = service.list_doctors()
     doc_ids: list[int] = []
     if not existing_docs:
@@ -39,7 +37,6 @@ def seed_data(repo: HospitalRepository | None = None) -> None:
         doc_ids = [d.id for d in existing_docs if d.id is not None]
         print(f" -> Doctors already exist ({len(doc_ids)} found).")
 
-    # 3. Patients
     existing_pats = service.list_patients()
     pat_ids: list[int] = []
     if not existing_pats:
@@ -52,7 +49,6 @@ def seed_data(repo: HospitalRepository | None = None) -> None:
         pat_ids = [p.id for p in existing_pats if p.id is not None]
         print(f" -> Patients already exist ({len(pat_ids)} found).")
 
-    # 4. Appointments
     if doc_ids and pat_ids:
         try:
             service.book_appointment(
@@ -75,7 +71,6 @@ def seed_data(repo: HospitalRepository | None = None) -> None:
             except DoubleBookingError:
                 pass
 
-    # 5. Bills
     if pat_ids:
         bills = repo.list_bills_for_patient(pat_ids[0])
         if not bills:

@@ -11,7 +11,7 @@ class Consumer:
     name: str
     address: str
     meter_number: str
-    tariff_category: str = "RESIDENTIAL"  # RESIDENTIAL, COMMERCIAL
+    tariff_category: str = "RESIDENTIAL"
     id: int | None = None
 
     def __post_init__(self) -> None:
@@ -28,8 +28,8 @@ class MeterReading:
     """Represents an officially recorded meter reading in kWh units."""
 
     consumer_id: int
-    reading_date: str  # YYYY-MM-DD
-    reading_value: int  # Cumulative kWh units
+    reading_date: str
+    reading_value: int
     id: int | None = None
 
     def __post_init__(self) -> None:
@@ -44,7 +44,7 @@ class TariffSlab:
     """Defines a tiered pricing slab in kWh units and minor-unit cents."""
 
     min_units: int
-    max_units: int | None  # None indicates upper unbounded slab
+    max_units: int | None
     rate_per_unit_cents: int
 
     def __post_init__(self) -> None:
@@ -79,8 +79,8 @@ class ElectricityBill:
     fixed_charge_cents: int
     tax_cents: int
     total_cents: int
-    due_date: str  # YYYY-MM-DD
-    status: str = "UNPAID"  # UNPAID, PAID
+    due_date: str
+    status: str = "UNPAID"
     issued_at: str = ""
     paid_at: str | None = None
     id: int | None = None

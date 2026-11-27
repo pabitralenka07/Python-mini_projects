@@ -90,7 +90,6 @@ class ContactGUIApp:
         btn_clear = ttk.Button(btn_frame, text="Clear Form", command=self._clear_form)
         btn_clear.pack(side=tk.LEFT, padx=3)
 
-        # Search Bar
         search_frame = ttk.Frame(self.root)
         search_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -104,14 +103,12 @@ class ContactGUIApp:
         btn_reset = ttk.Button(search_frame, text="Reset", command=self.refresh_table)
         btn_reset.pack(side=tk.LEFT, padx=5)
 
-        # CSV actions
         btn_export = ttk.Button(search_frame, text="Export CSV", command=self._on_export)
         btn_export.pack(side=tk.RIGHT, padx=5)
 
         btn_import = ttk.Button(search_frame, text="Import CSV", command=self._on_import)
         btn_import.pack(side=tk.RIGHT, padx=5)
 
-        # Table
         columns = ("id", "name", "phone", "email", "address", "created")
         self.tree = ttk.Treeview(self.root, columns=columns, show="headings")
         self.tree.heading("id", text="ID")

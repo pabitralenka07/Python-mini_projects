@@ -45,7 +45,6 @@ def service(repo: LibraryRepository, clock: FrozenClock) -> LibraryService:
     )
 
 
-# --- 1. Service & Domain Logic Tests ---
 
 
 def test_add_and_search_books(service: LibraryService) -> None:
@@ -98,58 +97,51 @@ def test_issue_book_and_borrow_limit(service: LibraryService) -> None:
     b = service.add_book("ISBN-BOOK", "Python Crash Course", "Eric Matthes", 1)
     m = service.register_member("M10", "Charlie", "charlie@example.com", max_borrow_limit=1)
 
-    # Issue book 1
-    loan_id = service.issue_book(b.id, m.id)  # type: ignore[arg-type]
+    loan_id = service.issue_book(b.id, m.id)
     assert loan_id == 1
 
-    # Book inventory should be 0 available now
-    updated_book = service.repo.get_book_by_id(b.id)  # type: ignore[arg-type]
+    updated_book = service.repo.get_book_by_id(b.id)
     assert updated_book is not None
     assert updated_book.available_copies == 0
 
-    # Cannot borrow when no copies available
     with pytest.raises(BookUnavailableError):
-        service.issue_book(b.id, m.id)  # type: ignore[arg-type]
+        service.issue_book(b.id, m.id)
 
-    # Member borrow limit check
     b2 = service.add_book("ISBN-BOOK2", "Fluent Python", "Luciano Ramalho", 2)
     with pytest.raises(BorrowLimitExceededError):
-        service.issue_book(b2.id, m.id)  # type: ignore[arg-type]
+        service.issue_book(b2.id, m.id)
 
 
 def test_due_date_and_overdue_fines(service: LibraryService, clock: FrozenClock) -> None:
     b = service.add_book("ISBN-FINE", "Operating Systems", "Silberschatz", 2)
     m = service.register_member("M20", "Diana", "diana@example.com", max_borrow_limit=3)
 
-    loan_id = service.issue_book(b.id, m.id)  # type: ignore[arg-type]
+    loan_id = service.issue_book(b.id, m.id)
     loan = service.repo.get_loan_by_id(loan_id)
     assert loan is not None
     assert loan.loan_date == "2026-06-01"
     assert loan.due_date == "2026-06-15"
 
-    # Return on day 10 (on time, 0 fines)
     clock.advance(days=10)
     overdue_days, fine_cents = service.return_book(loan_id)
     assert overdue_days == 0
     assert fine_cents == 0
 
-    # Issue again and test overdue fine
-    loan_id2 = service.issue_book(b.id, m.id)  # type: ignore[arg-type]
-    # Loan issued on 2026-06-11, due on 2026-06-25
-    clock.advance(days=18)  # Advances to 2026-06-29 (4 days overdue)
+    loan_id2 = service.issue_book(b.id, m.id)
+    clock.advance(days=18)
     overdue_days2, fine_cents2 = service.return_book(loan_id2)
     assert overdue_days2 == 4
-    assert fine_cents2 == 200  # 4 days * 50 cents = 200 cents ($2.00)
+    assert fine_cents2 == 200
 
 
 def test_cannot_delete_book_on_loan(service: LibraryService) -> None:
     b = service.add_book("ISBN-DEL", "Clean Code", "Robert Martin", 2)
     m = service.register_member("M30", "Eve", "eve@example.com")
 
-    service.issue_book(b.id, m.id)  # type: ignore[arg-type]
+    service.issue_book(b.id, m.id)
 
     with pytest.raises(ActiveLoanDeleteError, match="actively on loan"):
-        service.delete_book(b.id)  # type: ignore[arg-type]
+        service.delete_book(b.id)
 
 
 def test_delete_book_succeeds_when_not_on_loan(service: LibraryService) -> None:
@@ -160,7 +152,6 @@ def test_delete_book_succeeds_when_not_on_loan(service: LibraryService) -> None:
     assert service.repo.get_book_by_id(book_id) is None
 
 
-# --- 2. GUI Controller Headless Tests ---
 
 
 def test_gui_controller_operations(service: LibraryService) -> None:
@@ -171,7 +162,7 @@ def test_gui_controller_operations(service: LibraryService) -> None:
     assert len(ctrl.list_books()) == 1
     assert len(ctrl.list_members()) == 1
 
-    loan_id = ctrl.issue_book(book.id, member.id)  # type: ignore[arg-type]
+    loan_id = ctrl.issue_book(book.id, member.id)
     assert loan_id == 1
     assert len(ctrl.list_loans()) == 1
 
@@ -180,7 +171,6 @@ def test_gui_controller_operations(service: LibraryService) -> None:
     assert fine_cents == 0
 
 
-# --- 3. CLI Subprocess & EOF Tests ---
 
 
 def test_cli_eof_clean_exit(tmp_path: Path) -> None:
@@ -189,7 +179,7 @@ def test_cli_eof_clean_exit(tmp_path: Path) -> None:
     proc = subprocess.run(
         [sys.executable, "-m", "projects.p04_library_management"],
         cwd=root_dir,
-        stdin=subprocess.DEVNULL,  # Sends EOF immediately
+        stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,
     )
@@ -203,14 +193,9 @@ def test_cli_menu_add_and_list_flow(
     """Test interactive menu simulation via monkeypatch."""
     from projects.p04_library_management.cli import run_cli
 
-    # Menu choices:
-    # 1 -> Add book ("ISBN-CLI", "CLI Book", "CLI Author", "2")
-    # 3 -> List all books
-    # 0 -> Exit
     inputs = iter(["1", "ISBN-CLI", "CLI Book", "CLI Author", "2", "3", "0"])
     monkeypatch.setattr("builtins.input", lambda _: next(inputs))
 
-    # Should run and exit without error
     run_cli(service)
 
     books = service.list_books()

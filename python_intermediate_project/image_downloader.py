@@ -134,7 +134,7 @@ class App:
         threading.Thread(target=self.work, args=args, daemon=True).start()
         self.root.after(100, self.poll)
 
-    def work(self, query, n, pexels, key, folder):  # runs in a worker thread: only touch self.q here
+    def work(self, query, n, pexels, key, folder):
         try:
             items = search_pexels(query, n, key) if pexels else search_openverse(query, n)
             if not items:

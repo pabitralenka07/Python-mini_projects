@@ -31,7 +31,6 @@ class SnakeGame:
         mid_x = self.grid_width // 2
         mid_y = self.grid_height // 2
 
-        # Initial snake of 3 segments heading RIGHT
         snake = [
             Point(mid_x, mid_y),
             Point(mid_x - 1, mid_y),
@@ -40,7 +39,6 @@ class SnakeGame:
         direction = Direction.RIGHT
         high_score = load_high_score(self.storage_path)
 
-        # Place initial food
         empty_points = [
             Point(x, y)
             for x in range(self.grid_width)
@@ -77,7 +75,6 @@ class SnakeGame:
             if Point(x, y) not in snake_points
         ]
         if not empty_points:
-            # Snake filled the entire grid (victory condition)
             return Point(-1, -1)
         return self.rng.choice(empty_points)
 
@@ -86,7 +83,6 @@ class SnakeGame:
         if self.state.is_game_over or self.state.is_paused:
             return False
 
-        # Reject immediate 180-degree reversal
         if new_direction == self.state.direction.opposite:
             return False
 
@@ -112,7 +108,6 @@ class SnakeGame:
         dx, dy = self.state.direction.value
         new_head = Point(head.x + dx, head.y + dy)
 
-        # 1. Wall collision check
         if (
             new_head.x < 0
             or new_head.x >= self.grid_width
@@ -122,24 +117,19 @@ class SnakeGame:
             self._handle_game_over()
             return False
 
-        # 2. Self collision check (excluding current tail since it will move, unless eating)
-        # In standard Snake, hitting any current body segment except the tail that vacates is fatal
         body_to_check = self.state.snake[:-1]
         if new_head in body_to_check:
             self._handle_game_over()
             return False
 
-        # 3. Safe movement: add new head
         self.state.snake.insert(0, new_head)
 
-        # 4. Food consumption check
         if new_head == self.state.food:
             self.state.score += 10
             if self.state.score > self.state.high_score:
                 self.state.high_score = self.state.score
             self.state.food = self.spawn_food()
         else:
-            # Did not eat food: remove tail segment
             self.state.snake.pop()
 
         return True

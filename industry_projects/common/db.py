@@ -108,7 +108,6 @@ class DatabaseManager:
     def _initialize_or_verify(self) -> None:
         """Perform opening ceremony: integrity check or initialization."""
         if self.is_memory:
-            # Keep persistent memory connection alive so in-memory tables survive
             self._memory_conn = sqlite3.connect(":memory:")
             self._memory_conn.row_factory = sqlite3.Row
             self._memory_conn.execute("PRAGMA foreign_keys = ON;")
@@ -117,15 +116,12 @@ class DatabaseManager:
                 self._memory_conn.execute(f"PRAGMA user_version = {self.expected_user_version};")
             return
 
-        # Ensure parent folder exists
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
         if not self.db_path.exists():
-            # Brand new database creation
             self._create_fresh_db()
             return
 
-        # Database exists: run quick_check and check header
         is_intact, reason = check_db_file_integrity(self.db_path)
         version_valid = False
 
@@ -146,11 +142,9 @@ class DatabaseManager:
                 conn.close()
 
         if not is_intact or not version_valid:
-            # File is corrupt or invalid version
             self._handle_corruption(reason)
             return
 
-        # Database is intact and valid; create or refresh backup using backup API
         with suppress(DatabaseError, sqlite3.Error, OSError):
             self.backup()
 
@@ -164,7 +158,6 @@ class DatabaseManager:
         finally:
             conn.close()
 
-        # Create initial backup
         if not self.is_memory:
             self.backup()
 
@@ -189,7 +182,6 @@ class DatabaseManager:
                 f"Database corrupted ({reason}), and failed to move to {corrupt_path}: {err}"
             ) from err
 
-        # Check if backup exists
         if not self.bak_path.exists():
             raise DatabaseCorruptionError(
                 f"Database corrupted ({reason}). Moved corrupt file to {corrupt_path.name}. "
@@ -208,10 +200,8 @@ class DatabaseManager:
                 "Manual data recovery required."
             )
 
-        # Backup is valid
         if self.auto_restore_backup:
             shutil.copy2(str(self.bak_path), str(self.db_path))
-            # Verify restored file
             restored_conn = self.connect()
             restored_conn.close()
         else:

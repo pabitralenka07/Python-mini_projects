@@ -16,7 +16,7 @@ class BlockRule:
 class BlockerResult:
     """Result summary of a website blocker operation."""
 
-    action: str  # "BLOCK", "UNBLOCK", "CLEAR", "RESTORE"
+    action: str
     is_dry_run: bool
     modified: bool
     blocked_domains: list[str]

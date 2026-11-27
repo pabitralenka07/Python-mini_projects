@@ -8,7 +8,7 @@ class Bus:
     """Represents a bus vehicle in the fleet."""
 
     bus_number: str
-    bus_type: str  # AC_SLEEPER, AC_SEATER, NON_AC_SEATER
+    bus_type: str
     total_seats: int
     id: int | None = None
 
@@ -45,8 +45,8 @@ class Schedule:
 
     bus_id: int
     route_id: int
-    departure_time: str  # ISO 8601: YYYY-MM-DDTHH:MM:SS
-    arrival_time: str  # ISO 8601: YYYY-MM-DDTHH:MM:SS
+    departure_time: str
+    arrival_time: str
     fare_cents: int
     id: int | None = None
 
@@ -84,7 +84,7 @@ class Booking:
     passenger_phone: str
     seat_number: int
     fare_paid_cents: int
-    status: str = "CONFIRMED"  # CONFIRMED, CANCELLED
+    status: str = "CONFIRMED"
     created_at: str = ""
     cancelled_at: str | None = None
     refund_cents: int = 0

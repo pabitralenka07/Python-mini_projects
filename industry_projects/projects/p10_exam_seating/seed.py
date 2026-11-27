@@ -17,16 +17,14 @@ def seed_data(repo: ExamRepository | None = None) -> None:
     service = ExamSeatingService(repo)
     print("Seeding Exam Seating Arrangement System...")
 
-    # 1. Rooms
     rooms = repo.list_rooms()
     if not rooms:
-        service.register_room("HALL-101", rows=3, cols=4)  # 12 capacity
-        service.register_room("HALL-102", rows=4, cols=4)  # 16 capacity
+        service.register_room("HALL-101", rows=3, cols=4)
+        service.register_room("HALL-102", rows=4, cols=4)
         print(" -> Configured exam halls: HALL-101 (12 seats) and HALL-102 (16 seats).")
     else:
         print(f" -> Exam rooms already exist ({len(rooms)} found).")
 
-    # 2. Exams
     exams = repo.list_all_exams()
     if not exams:
         service.schedule_exam("CS101", "Introduction to Programming", "2026-12-10", "MORNING")
@@ -35,7 +33,6 @@ def seed_data(repo: ExamRepository | None = None) -> None:
     else:
         print(f" -> Exams already exist ({len(exams)} found).")
 
-    # 3. Students
     students = repo.list_all_students()
     if not students:
         cs_students = [
@@ -68,7 +65,6 @@ def seed_data(repo: ExamRepository | None = None) -> None:
     else:
         print(f" -> Students already exist ({len(students)} found).")
 
-    # 4. Run Deterministic Allocation
     try:
         count = service.allocate_exam_session("2026-12-10", "MORNING", seed=42)
         print(f" -> Generated seating allocation: {count} students seated across halls.")

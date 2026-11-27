@@ -75,7 +75,6 @@ class ExamRepository:
         )
         return cls(manager)
 
-    # --- Students ---
 
     def add_student(self, student: Student) -> Student:
         query = "INSERT INTO students (roll_number, name, course_code) VALUES (?, ?, ?);"
@@ -126,7 +125,6 @@ class ExamRepository:
                 for r in rows
             ]
 
-    # --- Rooms ---
 
     def add_room(self, room: Room) -> Room:
         query = "INSERT INTO rooms (room_number, rows, cols, total_capacity) VALUES (?, ?, ?, ?);"
@@ -177,7 +175,6 @@ class ExamRepository:
                 for r in rows
             ]
 
-    # --- Exams ---
 
     def add_exam(self, exam: Exam) -> Exam:
         query = "INSERT INTO exams (course_code, exam_name, exam_date, slot) VALUES (?, ?, ?, ?);"
@@ -234,7 +231,6 @@ class ExamRepository:
                 for r in rows
             ]
 
-    # --- Seat Allocations ---
 
     def clear_allocations_for_exams(self, exam_ids: list[int]) -> None:
         if not exam_ids:

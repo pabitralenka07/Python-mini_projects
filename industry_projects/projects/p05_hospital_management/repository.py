@@ -88,7 +88,6 @@ class HospitalRepository:
         )
         return cls(manager)
 
-    # --- Doctors ---
 
     def add_doctor(self, doctor: Doctor) -> Doctor:
         query = """
@@ -140,7 +139,6 @@ class HospitalRepository:
                 for r in rows
             ]
 
-    # --- Patients ---
 
     def add_patient(self, patient: Patient) -> Patient:
         query = """
@@ -219,7 +217,6 @@ class HospitalRepository:
         with self.db.get_connection() as conn, conn:
             conn.execute(query, (discharge_date, patient_id))
 
-    # --- Appointments ---
 
     def create_appointment(self, doctor_id: int, patient_id: int, slot_datetime: str) -> int:
         query = """
@@ -273,7 +270,6 @@ class HospitalRepository:
                 for r in rows
             ]
 
-    # --- Billing ---
 
     def create_bill(self, bill: Bill) -> Bill:
         query = """
@@ -364,7 +360,6 @@ class HospitalRepository:
                 for r in rows
             ]
 
-    # --- Admin Authentication (Educational Simulation) ---
 
     def add_admin(self, admin: AdminUser) -> None:
         query = """

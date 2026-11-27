@@ -62,23 +62,19 @@ class ContactService:
         if not name_clean:
             raise ValidationError("Name cannot be empty.")
 
-        # Phone validation: digits, optional leading +, dashes, spaces, parentheses
         digits_only = re.sub(r"\D", "", phone_clean)
         if len(digits_only) < 7 or len(digits_only) > 15:
             raise ValidationError(f"Phone '{phone_clean}' must contain between 7 and 15 digits.")
 
-        # Email validation
         if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email_clean):
             raise ValidationError(f"Email '{email_clean}' is not a valid email address.")
 
-        # Duplicate phone check
         existing_phone = self.repo.get_contact_by_phone(phone_clean)
         if existing_phone and existing_phone.id != exclude_id:
             raise DuplicateContactError(
                 f"A contact with phone '{phone_clean}' already exists ({existing_phone.name})."
             )
 
-        # Duplicate email check
         existing_email = self.repo.get_contact_by_email(email_clean)
         if existing_email and existing_email.id != exclude_id:
             raise DuplicateContactError(

@@ -9,7 +9,6 @@ from projects.p04_library_management.service import LibraryService
 def seed_database(service: LibraryService) -> None:
     print("Seeding database with clearly labeled fake demo data...")
 
-    # Fake Books
     books = [
         ("978-0-FAKE-001", "[FAKE] The Pragmatic Pythonist", "Arthur Pendelton (Fictional)", 5),
         ("978-0-FAKE-002", "[FAKE] Algorithms in Wonderland", "Lewis Carroll Jr. (Fictional)", 3),
@@ -21,12 +20,11 @@ def seed_database(service: LibraryService) -> None:
     for isbn, title, author, copies in books:
         try:
             b = service.add_book(isbn, title, author, copies)
-            book_ids.append(b.id)  # type: ignore[arg-type]
+            book_ids.append(b.id)
             print(f"  Added fake book: {b.title} (ID {b.id})")
         except Exception as e:
             print(f"  Skipped book '{title}': {e}")
 
-    # Fake Members
     members = [
         ("MEM-901", "[FAKE] Alice Wonder", "alice.fake@example.com", 3),
         ("MEM-902", "[FAKE] Bob Builder", "bob.fake@example.com", 2),
@@ -37,12 +35,11 @@ def seed_database(service: LibraryService) -> None:
     for code, name, email, limit in members:
         try:
             m = service.register_member(code, name, email, limit)
-            member_ids.append(m.id)  # type: ignore[arg-type]
+            member_ids.append(m.id)
             print(f"  Added fake member: {m.name} (ID {m.id})")
         except Exception as e:
             print(f"  Skipped member '{name}': {e}")
 
-    # Fake Loans
     if book_ids and member_ids:
         try:
             loan_id = service.issue_book(book_ids[0], member_ids[0])

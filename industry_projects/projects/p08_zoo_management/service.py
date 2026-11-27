@@ -57,7 +57,6 @@ class ZooService:
         self.repo = repository
         self.clock = clock if clock is not None else SystemClock()
 
-    # --- Enclosures ---
 
     def create_enclosure(self, name: str, habitat_type: str, max_capacity: int) -> Enclosure:
         if max_capacity <= 0:
@@ -73,7 +72,6 @@ class ZooService:
     def list_enclosures(self) -> list[EnclosureDetail]:
         return self.repo.list_enclosure_details()
 
-    # --- Animals & Capacity Invariant ---
 
     def add_animal(
         self,
@@ -88,7 +86,6 @@ class ZooService:
         if not enclosure:
             raise EnclosureNotFoundError(f"Enclosure ID {enclosure_id} not found.")
 
-        # Check strict capacity invariant
         current_count = self.repo.count_animals_in_enclosure(enclosure_id)
         if current_count >= enclosure.max_capacity:
             raise EnclosureCapacityExceededError(
@@ -116,7 +113,6 @@ class ZooService:
     def get_feeding_schedule(self) -> list[FeedingScheduleEntry]:
         return self.repo.list_feeding_schedule()
 
-    # --- Staff Keepers ---
 
     def register_keeper(
         self, name: str, employee_id: str, assigned_enclosure_id: int | None = None
@@ -142,7 +138,6 @@ class ZooService:
             raise EnclosureNotFoundError(f"Enclosure ID {enclosure_id} not found.")
         self.repo.assign_keeper_enclosure(keeper_id, enclosure_id)
 
-    # --- Ticket Sales & Daily Revenue Reports ---
 
     def sell_tickets(self, ticket_type: str, quantity: int) -> TicketSale:
         tt_clean = ticket_type.strip().upper()

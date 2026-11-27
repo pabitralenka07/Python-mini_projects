@@ -93,7 +93,7 @@ class ATMService:
         atm_repository: ATMRepository,
         bank_service: BankService,
         clock: Clock | None = None,
-        daily_limit_cents: int = 100000,  # $1,000.00 daily limit
+        daily_limit_cents: int = 100000,
         max_pin_attempts: int = 3,
         lockout_minutes: int = 15,
     ) -> None:
@@ -106,7 +106,6 @@ class ATMService:
 
     def issue_card(self, card_number: str, account_number: str, pin: str) -> ATMCard:
         """Issue an educational ATM card with scrypt PIN hash and salt."""
-        # Verify account exists in Bank
         _ = self.bank.get_account(account_number)
 
         pin_clean = pin.strip()
@@ -142,7 +141,6 @@ class ATMService:
         if not verify_secret(pin, card.salt, card.pin_hash):
             attempts = card.failed_attempts + 1
             if attempts >= self.max_pin_attempts:
-                # Lock card for lockout_minutes
                 dt_now = datetime.fromisoformat(now_iso)
                 locked_until = (dt_now + timedelta(minutes=self.lockout_minutes)).isoformat()
                 self.repo.record_failed_attempt(card.card_number, attempts, locked_until)
@@ -157,7 +155,6 @@ class ATMService:
                     f"Incorrect PIN. {remaining} attempt(s) remaining before card lockout."
                 )
 
-        # PIN is correct; reset failed attempts
         if card.failed_attempts > 0 or card.locked_until is not None:
             self.repo.reset_failed_attempts(card.card_number)
 
@@ -175,10 +172,8 @@ class ATMService:
         if not card:
             raise CardNotFoundError(f"Card '{card_number}' not found.")
 
-        # 1. Banknote denomination decomposition
         dispense_result = calculate_banknotes(amount_cents)
 
-        # 2. Daily limit enforcement
         today = self.clock.today_iso()
         already_withdrawn = self.repo.get_daily_withdrawn_cents(card.card_number, today)
         if already_withdrawn + amount_cents > self.daily_limit_cents:
@@ -190,10 +185,8 @@ class ATMService:
                 f"Maximum remaining today: {avail_str}."
             )
 
-        # 3. Delegate debit to Bank service (enforces balance/overdraft rules)
         self.bank.withdraw(card.account_number, amount_cents)
 
-        # 4. Record daily ATM usage
         self.repo.record_daily_withdrawal(card.card_number, today, amount_cents)
 
         return dispense_result

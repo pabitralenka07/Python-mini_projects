@@ -61,13 +61,12 @@ class CheckInNotAllowedError(AirportError):
     pass
 
 
-# Valid state transitions for commercial flights
 ALLOWED_TRANSITIONS: dict[str, set[str]] = {
     FlightStatus.SCHEDULED: {FlightStatus.BOARDING, FlightStatus.DELAYED, FlightStatus.CANCELLED},
     FlightStatus.BOARDING: {FlightStatus.DEPARTED, FlightStatus.CANCELLED},
     FlightStatus.DELAYED: {FlightStatus.BOARDING, FlightStatus.CANCELLED},
-    FlightStatus.DEPARTED: set(),  # Terminal state
-    FlightStatus.CANCELLED: set(),  # Terminal state
+    FlightStatus.DEPARTED: set(),
+    FlightStatus.CANCELLED: set(),
 }
 
 
@@ -80,7 +79,6 @@ class AirportService:
         self.repo = repository
         self.clock = clock if clock is not None else SystemClock()
 
-    # --- Gates & Flights Registration ---
 
     def register_gate(self, gate_number: str, terminal: str) -> Gate:
         gate = Gate(gate_number=gate_number.strip().upper(), terminal=terminal.strip().upper())
@@ -123,7 +121,6 @@ class AirportService:
             raise FlightNotFoundError(f"Flight '{flight_number}' not found.")
         return flight
 
-    # --- Gate Assignment with Overlap Rejection ---
 
     def assign_gate(self, flight_id: int, gate_id: int, turnaround_minutes: int = 60) -> None:
         flight = self.get_flight(flight_id)
@@ -133,14 +130,12 @@ class AirportService:
 
         target_dep = datetime.fromisoformat(flight.departure_time)
 
-        # Inspect all non-departed/non-cancelled flights currently assigned to this gate
         existing_flights = self.repo.list_flights_at_gate(gate_id)
         for existing in existing_flights:
             if existing.id == flight.id:
                 continue
 
             existing_dep = datetime.fromisoformat(existing.departure_time)
-            # Ensure timezone awareness matches
             if target_dep.tzinfo is not None and existing_dep.tzinfo is None:
                 existing_dep = existing_dep.replace(tzinfo=target_dep.tzinfo)
             elif target_dep.tzinfo is None and existing_dep.tzinfo is not None:
@@ -156,7 +151,6 @@ class AirportService:
 
         self.repo.assign_gate(flight_id, gate_id)
 
-    # --- Validated Flight Status State Machine ---
 
     def update_flight_status(self, flight_id: int, target_status: str) -> None:
         flight = self.get_flight(flight_id)
@@ -175,7 +169,6 @@ class AirportService:
 
         self.repo.update_flight_status(flight_id, target_clean)
 
-    # --- Passenger Check-In & Seat Assignment ---
 
     def register_passenger(self, full_name: str, passport_number: str, flight_id: int) -> Passenger:
         self.get_flight(flight_id)
@@ -209,7 +202,6 @@ class AirportService:
 
         self.repo.check_in_passenger(passenger_id, seat_clean)
 
-    # --- Flight Schedule Board ---
 
     def get_departure_board(self) -> list[BoardEntry]:
         return self.repo.list_board_entries()

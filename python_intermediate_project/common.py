@@ -29,7 +29,7 @@ class Database:
         return self.conn.execute(sql, params).fetchone()
 
     def execute(self, sql, params=()):
-        with self.conn:  # commit on success, rollback on error
+        with self.conn:
             return self.conn.execute(sql, params).lastrowid
 
     def columns_and_rows(self, sql, params=()):
@@ -37,7 +37,6 @@ class Database:
         return [d[0] for d in cur.description], cur.fetchall()
 
 
-# ---------- validation / parsing ----------
 def guarded(fn):
     """Show errors in a message box instead of crashing the GUI."""
     @functools.wraps(fn)
@@ -82,7 +81,6 @@ def options(db, sql):
     return lambda: [f"{r[0]} - {r[1]}" for r in db.query(sql)]
 
 
-# ---------- widgets ----------
 def form_entries(parent, labels, width=24):
     entries = {}
     for i, label in enumerate(labels):
@@ -127,7 +125,6 @@ def launch(app_cls, title, size="1000x640"):
     root.mainloop()
 
 
-# ---------- generic CRUD tab ----------
 class Field:
     def __init__(self, name, label=None, kind="text", choices=None, required=True, fk=False):
         self.name = name

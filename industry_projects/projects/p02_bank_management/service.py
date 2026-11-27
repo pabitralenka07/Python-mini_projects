@@ -65,7 +65,6 @@ class BankService:
     def _get_timestamp(self) -> str:
         return self.clock.now_iso()
 
-    # --- Customers ---
 
     def register_customer(self, name: str, email: str) -> Customer:
         name_clean = name.strip()
@@ -86,7 +85,6 @@ class BankService:
     def list_customers(self) -> list[Customer]:
         return self.repo.list_customers()
 
-    # --- Account Opening & Closing ---
 
     def open_account(
         self, customer_id: int, account_type: str, initial_deposit_cents: int = 0
@@ -103,7 +101,6 @@ class BankService:
             raise InvalidAmountError("Initial deposit cannot be negative.")
 
         prefix = "SAV" if acc_type_norm == "SAVINGS" else "CUR"
-        # Generate 6-digit random account number
         rand_suffix = f"{secrets.randbelow(900000) + 100000}"
         account_number = f"{prefix}-{rand_suffix}"
 
@@ -111,7 +108,7 @@ class BankService:
 
         account: Account
         if acc_type_norm == "SAVINGS":
-            min_bal = 5000  # $50.00
+            min_bal = 5000
             if initial_deposit_cents < min_bal:
                 raise BankError(
                     f"Savings accounts require an initial deposit of at least "
@@ -126,7 +123,7 @@ class BankService:
                 created_at=created_at,
             )
         else:
-            overdraft = 50000  # $500.00
+            overdraft = 50000
             account = CurrentAccount(
                 account_number=account_number,
                 customer_id=customer_id,
@@ -139,7 +136,6 @@ class BankService:
         self.repo.add_account(account)
 
         if initial_deposit_cents > 0:
-            # Fund initial deposit through ledger
             final_bal = self.repo.execute_deposit(account_number, initial_deposit_cents, created_at)
             account.balance_cents = final_bal
 
@@ -171,7 +167,6 @@ class BankService:
     def list_accounts_for_customer(self, customer_id: int) -> list[Account]:
         return self.repo.list_accounts_for_customer(customer_id)
 
-    # --- Financial Operations ---
 
     def deposit(self, account_number: str, amount_cents: int) -> int:
         if amount_cents <= 0:

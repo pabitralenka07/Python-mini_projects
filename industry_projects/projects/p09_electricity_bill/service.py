@@ -46,25 +46,24 @@ class BillAlreadyPaidError(ElectricityError):
     pass
 
 
-# Default simulated tariff slabs
 RESIDENTIAL_SLABS: list[TariffSlab] = [
-    TariffSlab(min_units=0, max_units=100, rate_per_unit_cents=10),  # $0.10/kWh
-    TariffSlab(min_units=100, max_units=300, rate_per_unit_cents=15),  # $0.15/kWh
-    TariffSlab(min_units=300, max_units=500, rate_per_unit_cents=20),  # $0.20/kWh
-    TariffSlab(min_units=500, max_units=None, rate_per_unit_cents=30),  # $0.30/kWh
+    TariffSlab(min_units=0, max_units=100, rate_per_unit_cents=10),
+    TariffSlab(min_units=100, max_units=300, rate_per_unit_cents=15),
+    TariffSlab(min_units=300, max_units=500, rate_per_unit_cents=20),
+    TariffSlab(min_units=500, max_units=None, rate_per_unit_cents=30),
 ]
 
 COMMERCIAL_SLABS: list[TariffSlab] = [
-    TariffSlab(min_units=0, max_units=200, rate_per_unit_cents=20),  # $0.20/kWh
-    TariffSlab(min_units=200, max_units=None, rate_per_unit_cents=35),  # $0.35/kWh
+    TariffSlab(min_units=0, max_units=200, rate_per_unit_cents=20),
+    TariffSlab(min_units=200, max_units=None, rate_per_unit_cents=35),
 ]
 
 FIXED_CHARGES_CENTS: dict[str, int] = {
-    "RESIDENTIAL": 500,  # $5.00 fixed service charge
-    "COMMERCIAL": 1500,  # $15.00 fixed service charge
+    "RESIDENTIAL": 500,
+    "COMMERCIAL": 1500,
 }
 
-TAX_RATE: float = 0.05  # 5% utility tax
+TAX_RATE: float = 0.05
 
 
 class ElectricityService:
@@ -74,7 +73,6 @@ class ElectricityService:
         self.repo = repository
         self.clock = clock if clock is not None else SystemClock()
 
-    # --- Consumer Management ---
 
     def register_consumer(
         self,
@@ -98,7 +96,6 @@ class ElectricityService:
         )
         saved = self.repo.add_consumer(consumer)
 
-        # Record baseline initial reading
         if saved.id is not None:
             self.repo.add_meter_reading(
                 MeterReading(
@@ -125,7 +122,6 @@ class ElectricityService:
     def list_consumers(self) -> list[Consumer]:
         return self.repo.list_consumers()
 
-    # --- Slab Tariff Calculation ---
 
     def calculate_energy_charge(
         self, units: int, tariff_category: str
@@ -160,7 +156,6 @@ class ElectricityService:
 
         return total_energy_cents, breakdown
 
-    # --- Bill Generation with Monotonic Check ---
 
     def generate_bill(
         self, consumer_id: int, current_reading: int, reading_date: str | None = None
@@ -170,7 +165,6 @@ class ElectricityService:
         latest = self.repo.get_latest_meter_reading(consumer_id)
         previous_reading = latest.reading_value if latest else 0
 
-        # Enforce monotonic constraint
         if current_reading < previous_reading:
             raise NonMonotonicReadingError(
                 f"Current meter reading ({current_reading} kWh) cannot be less than "

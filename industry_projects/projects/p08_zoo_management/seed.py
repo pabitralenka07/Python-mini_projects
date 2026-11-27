@@ -18,7 +18,6 @@ def seed_data(repo: ZooRepository | None = None) -> None:
     service = ZooService(repo)
     print("Seeding Zoo Management System...")
 
-    # 1. Enclosures
     e1 = repo.get_enclosure_by_name("Savannah Plains")
     e2 = repo.get_enclosure_by_name("Tropical Aviary")
     e3 = repo.get_enclosure_by_name("Arctic Tundra")
@@ -33,7 +32,6 @@ def seed_data(repo: ZooRepository | None = None) -> None:
         e3 = service.create_enclosure("Arctic Tundra", "ARCTIC", 2)
         print(" -> Created enclosure: Arctic Tundra (Capacity: 2)")
 
-    # 2. Keepers
     keepers = service.list_keepers()
     if not keepers:
         service.register_keeper("Jane Goodall", "EMP-001", e1.id)
@@ -42,7 +40,6 @@ def seed_data(repo: ZooRepository | None = None) -> None:
     else:
         print(f" -> Keepers already exist ({len(keepers)} found).")
 
-    # 3. Animals
     timetable = service.get_feeding_schedule()
     if not timetable and e1 and e2 and e3 and e1.id and e2.id and e3.id:
         try:
@@ -56,7 +53,6 @@ def seed_data(repo: ZooRepository | None = None) -> None:
     else:
         print(f" -> Animals already exist ({len(timetable)} found).")
 
-    # 4. Admission Tickets
     today_report = service.get_daily_revenue_report()
     if today_report.total_tickets == 0:
         service.sell_tickets(TicketType.ADULT, 3)

@@ -76,22 +76,18 @@ class LibraryGUIApp:
         notebook = ttk.Notebook(self.root)
         notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Tab 1: Books
         self.books_tab = ttk.Frame(notebook)
         notebook.add(self.books_tab, text="Books Catalog")
         self._build_books_tab()
 
-        # Tab 2: Members
         self.members_tab = ttk.Frame(notebook)
         notebook.add(self.members_tab, text="Members")
         self._build_members_tab()
 
-        # Tab 3: Loans
         self.loans_tab = ttk.Frame(notebook)
         notebook.add(self.loans_tab, text="Loans & Returns")
         self._build_loans_tab()
 
-    # --- Books Tab ---
 
     def _build_books_tab(self) -> None:
         top_frame = ttk.LabelFrame(self.books_tab, text="Add / Search Book")
@@ -123,7 +119,6 @@ class LibraryGUIApp:
         btn_search = ttk.Button(top_frame, text="Find", command=self._on_search_books)
         btn_search.grid(row=1, column=6, padx=5, pady=5)
 
-        # Treeview
         tree_frame = ttk.Frame(self.books_tab)
         tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
@@ -193,7 +188,6 @@ class LibraryGUIApp:
         except LibraryError as err:
             messagebox.showerror("Error", str(err))
 
-    # --- Members Tab ---
 
     def _build_members_tab(self) -> None:
         form_frame = ttk.LabelFrame(self.members_tab, text="Register Member")
@@ -219,7 +213,6 @@ class LibraryGUIApp:
         btn_reg = ttk.Button(form_frame, text="Register", command=self._on_register_member)
         btn_reg.grid(row=0, column=8, padx=10, pady=5)
 
-        # Members Treeview
         columns = ("id", "code", "name", "email", "limit", "joined")
         self.members_tree = ttk.Treeview(self.members_tab, columns=columns, show="headings")
         self.members_tree.heading("id", text="ID")
@@ -257,7 +250,6 @@ class LibraryGUIApp:
         except LibraryError as err:
             messagebox.showerror("Error", str(err))
 
-    # --- Loans Tab ---
 
     def _build_loans_tab(self) -> None:
         ops_frame = ttk.LabelFrame(self.loans_tab, text="Borrow / Return Actions")
@@ -281,7 +273,6 @@ class LibraryGUIApp:
         )
         btn_return.grid(row=0, column=6, padx=10, pady=5)
 
-        # Loans Treeview
         columns = ("id", "book", "member", "loan_date", "due_date", "return_date", "fine", "status")
         self.loans_tree = ttk.Treeview(self.loans_tab, columns=columns, show="headings")
         self.loans_tree.heading("id", text="Loan ID")
@@ -347,7 +338,6 @@ class LibraryGUIApp:
         except LibraryError as err:
             messagebox.showerror("Error", str(err))
 
-    # --- Refreshes ---
 
     def refresh_all(self) -> None:
         self.refresh_books()

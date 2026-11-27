@@ -16,8 +16,8 @@ from projects.p13_image_downloader.models import (
     DownloadTask,
 )
 
-DEFAULT_MAX_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB safety limit
-DEFAULT_CHUNK_SIZE = 65536  # 64 KB streaming buffer
+DEFAULT_MAX_SIZE_BYTES = 50 * 1024 * 1024
+DEFAULT_CHUNK_SIZE = 65536
 USER_AGENT = "Mozilla/5.0 (compatible; AntigravityImageDownloader/1.0)"
 
 
@@ -30,7 +30,6 @@ def sanitize_filename(url: str, custom_name: str | None = None) -> str:
         path = parsed.path
         candidate = os.path.basename(path)
 
-    # Clean traversal characters and invalid path tokens
     clean = re.sub(r'[\/\\:\*\?"<>\|\0]', "_", candidate)
     clean = clean.replace("..", "_").strip(" ._")
 
@@ -38,7 +37,6 @@ def sanitize_filename(url: str, custom_name: str | None = None) -> str:
         url_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:8]
         clean = f"image_{url_hash}.jpg"
 
-    # Ensure typical extension if none present
     if "." not in clean:
         clean += ".jpg"
 
@@ -75,7 +73,6 @@ def download_single_image(
 
     try:
         with urllib.request.urlopen(req, timeout=timeout_seconds) as response:
-            # 1. Content-Length header safety check
             content_length = response.headers.get("Content-Length")
             if content_length:
                 try:
@@ -97,7 +94,6 @@ def download_single_image(
                 except ValueError:
                     pass
 
-            # 2. Streaming chunk download with SHA-256 hash calculation
             hasher = hashlib.sha256()
             bytes_received = 0
 
@@ -126,7 +122,6 @@ def download_single_image(
                     hasher.update(chunk)
                     f_out.write(chunk)
 
-            # Atomic rename from .part to final target
             os.replace(temp_path, target_path)
             elapsed = time.perf_counter() - start_time
 

@@ -70,7 +70,6 @@ class LibraryService:
         self.loan_duration_days = loan_duration_days
         self.fine_cents_per_day = fine_cents_per_day
 
-    # --- Books ---
 
     def add_book(self, isbn: str, title: str, author: str, total_copies: int) -> Book:
         isbn = isbn.strip()
@@ -120,7 +119,6 @@ class LibraryService:
 
         self.repo.delete_book(book_id)
 
-    # --- Members ---
 
     def register_member(
         self, member_code: str, name: str, email: str, max_borrow_limit: int = 3
@@ -154,7 +152,6 @@ class LibraryService:
     def list_members(self) -> list[Member]:
         return self.repo.list_members()
 
-    # --- Loans & Fines ---
 
     def issue_book(self, book_id: int, member_id: int) -> int:
         """Issue a book to a member, enforcing borrow limits and available inventory."""

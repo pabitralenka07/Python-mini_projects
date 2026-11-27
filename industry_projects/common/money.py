@@ -32,7 +32,6 @@ def parse_money_to_cents(amount_str: str, allow_negative: bool = False) -> int:
     if not allow_negative and val_float < 0:
         raise ValueError("Negative amounts are not permitted.")
 
-    # Split into whole and fractional parts to avoid float round-off
     if "." in raw:
         parts = raw.split(".")
         if len(parts) != 2:

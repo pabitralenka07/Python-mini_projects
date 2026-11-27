@@ -74,7 +74,6 @@ class ElectricityRepository:
         )
         return cls(manager)
 
-    # --- Consumers ---
 
     def add_consumer(self, consumer: Consumer) -> Consumer:
         query = """
@@ -160,7 +159,6 @@ class ElectricityRepository:
                 for r in rows
             ]
 
-    # --- Meter Readings ---
 
     def add_meter_reading(self, reading: MeterReading) -> MeterReading:
         query = (
@@ -201,7 +199,6 @@ class ElectricityRepository:
                 reading_value=row["reading_value"],
             )
 
-    # --- Bills ---
 
     def create_bill(self, bill: ElectricityBill) -> ElectricityBill:
         query = """

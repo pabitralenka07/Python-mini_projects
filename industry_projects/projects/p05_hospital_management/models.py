@@ -30,7 +30,7 @@ class Patient:
     phone: str
     admission_date: str
     discharge_date: str | None = None
-    status: str = "ADMITTED"  # ADMITTED, DISCHARGED
+    status: str = "ADMITTED"
     id: int | None = None
 
     def __post_init__(self) -> None:
@@ -46,8 +46,8 @@ class Appointment:
 
     doctor_id: int
     patient_id: int
-    slot_datetime: str  # YYYY-MM-DD HH:MM
-    status: str = "SCHEDULED"  # SCHEDULED, COMPLETED, CANCELLED
+    slot_datetime: str
+    status: str = "SCHEDULED"
     id: int | None = None
 
 

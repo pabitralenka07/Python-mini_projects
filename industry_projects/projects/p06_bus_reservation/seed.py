@@ -17,7 +17,6 @@ def seed_data(repo: BusRepository | None = None) -> None:
     service = BusService(repo)
     print("Seeding Bus Reservation System...")
 
-    # 1. Buses
     buses = repo.list_buses()
     bus_map: dict[str, int] = {b.bus_number: b.id for b in buses if b.id is not None}
     if not bus_map:
@@ -30,7 +29,6 @@ def seed_data(repo: BusRepository | None = None) -> None:
     else:
         print(f" -> Buses already exist ({len(bus_map)} found).")
 
-    # 2. Routes
     routes = repo.list_routes()
     route_map: dict[str, int] = {
         f"{r.origin}->{r.destination}": r.id for r in routes if r.id is not None
@@ -45,7 +43,6 @@ def seed_data(repo: BusRepository | None = None) -> None:
     else:
         print(f" -> Routes already exist ({len(route_map)} found).")
 
-    # 3. Schedules
     schedules = service.list_schedules()
     sch_ids: list[int] = [s.schedule_id for s in schedules]
     if not schedules and "BUS-101" in bus_map and "New York->Boston" in route_map:
@@ -69,7 +66,6 @@ def seed_data(repo: BusRepository | None = None) -> None:
     else:
         print(f" -> Schedules already exist ({len(schedules)} found).")
 
-    # 4. Bookings
     if sch_ids:
         try:
             service.book_seat(sch_ids[0], "Alice Cooper", "555-0111", 1)

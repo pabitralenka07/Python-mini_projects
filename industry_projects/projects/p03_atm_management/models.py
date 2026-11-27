@@ -13,7 +13,7 @@ class ATMCard:
     salt: bytes
     failed_attempts: int = 0
     locked_until: str | None = None
-    status: str = "ACTIVE"  # ACTIVE, BLOCKED
+    status: str = "ACTIVE"
 
 
 @dataclass(frozen=True)

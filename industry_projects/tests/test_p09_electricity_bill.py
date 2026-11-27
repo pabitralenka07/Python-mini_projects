@@ -46,10 +46,6 @@ def test_slab_tariff_calculation_tiers(
     electricity_setup: tuple[ElectricityRepository, ElectricityService, FrozenClock],
 ) -> None:
     _, service, _ = electricity_setup
-    # 250 units residential:
-    # 100 units @ 10c = 1000 cents
-    # 150 units @ 15c = 2250 cents
-    # Total energy charge = 3250 cents ($32.50)
     energy_cents, breakdown = service.calculate_energy_charge(250, "RESIDENTIAL")
     assert energy_cents == 3250
     assert len(breakdown) == 2
@@ -58,12 +54,6 @@ def test_slab_tariff_calculation_tiers(
     assert breakdown[1].units_in_slab == 150
     assert breakdown[1].amount_cents == 2250
 
-    # 600 units residential:
-    # 100 @ 10c = 1000c
-    # 200 @ 15c = 3000c
-    # 200 @ 20c = 4000c
-    # 100 @ 30c = 3000c
-    # Total = 11000 cents ($110.00)
     energy_600, _ = service.calculate_energy_charge(600, "RESIDENTIAL")
     assert energy_600 == 11000
 
@@ -81,11 +71,9 @@ def test_monotonic_reading_enforcement(
     )
     assert consumer.id is not None
 
-    # Submitting current reading of 450 kWh (< 500 kWh baseline) must fail
     with pytest.raises(NonMonotonicReadingError, match="cannot be less than previous reading"):
         service.generate_bill(consumer.id, current_reading=450)
 
-    # Submitting current reading of 750 kWh (>= 500 kWh) succeeds
     bill = service.generate_bill(consumer.id, current_reading=750)
     assert bill.units_consumed == 250
     assert bill.status == "UNPAID"
@@ -108,14 +96,12 @@ def test_bill_settlement_and_duplicate_payment_guard(
     assert bill.id is not None
     assert bill.status == "UNPAID"
 
-    # Settle bill
     service.pay_bill(bill.id)
     updated_bill = service.repo.get_bill(bill.id)
     assert updated_bill is not None
     assert updated_bill.status == "PAID"
     assert updated_bill.paid_at is not None
 
-    # Duplicate settlement attempt fails
     with pytest.raises(BillAlreadyPaidError, match="is already paid"):
         service.pay_bill(bill.id)
 
@@ -132,7 +118,6 @@ def test_gui_headless_initialization(
     electricity_setup: tuple[ElectricityRepository, ElectricityService, FrozenClock],
 ) -> None:
     _, service, _ = electricity_setup
-    # Headless-safe Tkinter test
     try:
         import tkinter as tk
 
@@ -143,5 +128,4 @@ def test_gui_headless_initialization(
         assert app.notebook.index("end") == 3
         root.destroy()
     except tk.TclError:
-        # Pass gracefully on headless Linux systems without X display
         pytest.skip("Tkinter display not available in headless test environment")

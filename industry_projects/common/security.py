@@ -29,7 +29,6 @@ def hash_secret(secret: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
     if salt is None:
         salt = generate_salt(16)
 
-    # scrypt with educational safe parameters
     derived = hashlib.scrypt(
         secret.encode("utf-8"),
         salt=salt,
@@ -54,7 +53,6 @@ def prompt_password(prompt: str = "Enter Password: ") -> str:
     except (EOFError, KeyboardInterrupt):
         raise
     except (getpass.GetPassWarning, OSError):
-        # Fallback for environments where getpass cannot hide input
         val = input(prompt)
     return val.strip()
 

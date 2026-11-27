@@ -55,13 +55,11 @@ def validate_domain(domain: str) -> str:
     if ":" in clean:
         raise InvalidDomainError(f"Invalid domain '{clean}': Port numbers are not allowed.")
 
-    # Check if raw IPv4
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", clean):
         raise InvalidDomainError(
             f"Invalid domain '{clean}': Raw IP addresses cannot be blocked as domain names."
         )
 
-    # Validate standard domain pattern (e.g. example.com or sub.example.co.uk)
     domain_regex = r"^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$"
     if not re.match(domain_regex, clean):
         raise InvalidDomainError(
@@ -78,7 +76,6 @@ class WebsiteBlockerService:
         if hosts_path is not None:
             self.hosts_path = hosts_path
         else:
-            # Default platform hosts location
             if os.name == "nt":
                 self.hosts_path = Path(r"C:\Windows\System32\drivers\etc\hosts")
             else:
@@ -153,12 +150,10 @@ class WebsiteBlockerService:
         self, before_lines: list[str], domains: set[str], after_lines: list[str]
     ) -> None:
         """Atomically writes new hosts content using a temporary file in the same directory."""
-        # Ensure parent directory exists
         self.hosts_path.parent.mkdir(parents=True, exist_ok=True)
 
         new_lines: list[str] = list(before_lines)
 
-        # Ensure newline before section if needed
         if new_lines and not new_lines[-1].endswith("\n"):
             new_lines[-1] += "\n"
 
@@ -170,7 +165,6 @@ class WebsiteBlockerService:
 
         new_lines.extend(after_lines)
 
-        # Atomic write with tempfile in same directory
         temp_fd, temp_path_str = tempfile.mkstemp(dir=self.hosts_path.parent, prefix="hosts_tmp_")
         temp_path = Path(temp_path_str)
 
@@ -180,7 +174,6 @@ class WebsiteBlockerService:
                 f.flush()
                 os.fsync(f.fileno())
 
-            # Atomic replace
             os.replace(temp_path, self.hosts_path)
         except OSError as e:
             if temp_path.exists():
@@ -193,7 +186,6 @@ class WebsiteBlockerService:
         for d in domains:
             cleaned = validate_domain(d)
             valid_domains.add(cleaned)
-            # Also add www subdomain if not already present
             if not cleaned.startswith("www.") and cleaned.count(".") == 1:
                 valid_domains.add(f"www.{cleaned}")
 

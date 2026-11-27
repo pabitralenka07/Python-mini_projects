@@ -67,7 +67,7 @@ class App:
             "FROM flights f WHERE f.status NOT IN ('Landed') ORDER BY f.departure")
         fill_tree(self.board_tree, cols, rows)
 
-    def tick(self):  # auto-refresh the board every 10 s
+    def tick(self):
         self.refresh()
         self.board.after(10000, self.tick)
 

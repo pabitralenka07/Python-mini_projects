@@ -13,7 +13,6 @@ class App:
         nb.pack(fill="both", expand=True)
         nb.bind("<<NotebookTabChanged>>", lambda _e: self.refresh())
 
-        # --- accounts tab ---
         tab = ttk.Frame(nb)
         nb.add(tab, text="Accounts")
         box = ttk.LabelFrame(tab, text="Open new account")
@@ -26,7 +25,6 @@ class App:
         holder.pack(fill="both", expand=True, padx=8, pady=6)
         self.acc_tree = make_tree(holder)
 
-        # --- transactions tab ---
         tab = ttk.Frame(nb)
         nb.add(tab, text="Transactions")
         box = ttk.LabelFrame(tab, text="Cash desk")
@@ -39,7 +37,6 @@ class App:
         self.result = ttk.Label(tab, text="", font=("Segoe UI", 11, "bold"))
         self.result.pack(anchor="w", padx=12, pady=8)
 
-        # --- statement tab ---
         tab = ttk.Frame(nb)
         nb.add(tab, text="Statement")
         top = ttk.Frame(tab)
@@ -93,7 +90,7 @@ class App:
     @guarded
     def statement(self):
         acc = parse_number(self.st_acc.get(), "Account no", int, 1)
-        self.bank.balance(acc)  # raises if the account does not exist
+        self.bank.balance(acc)
         fill_tree(self.st_tree, ["Time (UTC)", "Type", "Amount", "Balance", "Note"], self.bank.statement(acc))
 
 

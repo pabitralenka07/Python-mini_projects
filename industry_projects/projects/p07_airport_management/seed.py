@@ -18,7 +18,6 @@ def seed_data(repo: AirportRepository | None = None) -> None:
     service = AirportService(repo)
     print("Seeding Airport Management System...")
 
-    # 1. Gates
     gates = service.list_gates()
     gate_map: dict[str, int] = {g.gate_number: g.id for g in gates if g.id is not None}
     if not gate_map:
@@ -33,7 +32,6 @@ def seed_data(repo: AirportRepository | None = None) -> None:
     else:
         print(f" -> Gates already exist ({len(gate_map)} found).")
 
-    # 2. Flights
     f1 = repo.get_flight_by_number("AA-101")
     f2 = repo.get_flight_by_number("DL-202")
     f3 = repo.get_flight_by_number("UA-303")
@@ -75,7 +73,6 @@ def seed_data(repo: AirportRepository | None = None) -> None:
         )
         print(" -> Added flight UA-303 (San Francisco) at Gate B1 [SCHEDULED].")
 
-    # 3. Passengers
     if f1 and f1.id:
         p1 = repo.get_passenger_by_passport(f1.id, "USA-998811")
         if not p1:

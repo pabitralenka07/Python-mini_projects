@@ -13,9 +13,6 @@ def test_hash_and_verify_secret() -> None:
 
 
 def test_is_locked() -> None:
-    # Future lockout
     assert is_locked("2099-01-01T00:00:00+00:00", "2026-01-01T00:00:00+00:00") is True
-    # Past lockout
     assert is_locked("2020-01-01T00:00:00+00:00", "2026-01-01T00:00:00+00:00") is False
-    # None lockout
     assert is_locked(None) is False

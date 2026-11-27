@@ -46,8 +46,8 @@ class Exam:
 
     course_code: str
     exam_name: str
-    exam_date: str  # YYYY-MM-DD
-    slot: str  # MORNING, AFTERNOON
+    exam_date: str
+    slot: str
     id: int | None = None
 
     def __post_init__(self) -> None:
@@ -66,7 +66,7 @@ class SeatAllocation:
     exam_id: int
     student_id: int
     room_id: int
-    seat_label: str  # e.g. R1C1, R1C2
+    seat_label: str
     id: int | None = None
 
     def __post_init__(self) -> None:

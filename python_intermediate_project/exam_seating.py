@@ -17,13 +17,13 @@ def _search(seats, counts, limit, budget=200_000):
     """Backtracking over class labels (students of a class are interchangeable). None if infeasible."""
     placed, choice, options, i, nodes = {}, [None] * limit, [None] * limit, 0, 0
     while 0 <= i < limit:
-        if choice[i] is not None:  # undo the previous attempt at this seat
+        if choice[i] is not None:
             counts[choice[i]] += 1
             del placed[seats[i]]
             choice[i] = None
         if options[i] is None:
             options[i] = sorted((k for k, v in counts.items() if v > 0 and _neighbours_ok(placed, seats[i], k)),
-                                key=lambda k: -counts[k])  # try the biggest class first
+                                key=lambda k: -counts[k])
         if options[i]:
             k = options[i].pop(0)
             counts[k] -= 1

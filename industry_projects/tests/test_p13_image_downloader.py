@@ -202,7 +202,7 @@ def test_cli_batch_interactive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
         [
             "https://example.com/interactive1.png",
             "https://example.com/interactive2.png",
-            "",  # empty line stops entry
+            "",
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _: next(inputs))
@@ -225,6 +225,5 @@ def test_cli_view_downloads(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
 
 
 def test_cli_main_exit(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Choice 5 exits
     monkeypatch.setattr("builtins.input", lambda _: "5")
     run_cli()

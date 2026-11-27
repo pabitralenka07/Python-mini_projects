@@ -34,7 +34,7 @@ class BusSystem:
             raise AppError(f"Seat must be between 1 and {bus['seats']}")
         if not passenger.strip():
             raise AppError("Passenger name is required")
-        try:  # the UNIQUE constraint is the real guard against double booking
+        try:
             self.db.execute("INSERT INTO bookings(bus_id, travel_date, seat_no, passenger, phone) VALUES(?,?,?,?,?)",
                             (bus_id, travel_date, seat, passenger.strip(), phone.strip()))
         except sqlite3.IntegrityError:
@@ -110,7 +110,7 @@ class App:
         for n in range(1, seats + 1):
             b = tk.Button(self.grid, text=str(n), width=4, bg="#c62828" if n in taken else "#2e7d32", fg="white",
                           state="disabled" if n in taken else "normal", command=lambda n=n: self.pick(n))
-            b.grid(row=(n - 1) // 4, column=(n - 1) % 4 + ((n - 1) % 4 > 1), padx=3, pady=3)  # aisle gap
+            b.grid(row=(n - 1) // 4, column=(n - 1) % 4 + ((n - 1) % 4 > 1), padx=3, pady=3)
             self.buttons[n] = b
 
     def pick(self, seat):

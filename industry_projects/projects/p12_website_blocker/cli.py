@@ -19,7 +19,6 @@ from projects.p12_website_blocker.service import (
 
 
 def get_default_service() -> WebsiteBlockerService:
-    # Uses system hosts file by default
     return WebsiteBlockerService()
 
 
@@ -60,14 +59,12 @@ def block_websites(service: WebsiteBlockerService) -> None:
             print("No domains provided.")
             return
 
-        # 1. Preview changes in Dry-Run mode
         preview = service.block_domains(domains, dry_run=True)
         print(f"\n{preview.message}")
         print("Candidate blocked list after this operation:")
         for d in preview.blocked_domains:
             print(f"  * 127.0.0.1 {d}")
 
-        # 2. Confirm application
         if confirm_action("\nApply these changes to the hosts file?"):
             result = service.block_domains(domains, dry_run=False)
             print(f"[SUCCESS] {result.message}")
@@ -151,7 +148,6 @@ def manage_backups(service: WebsiteBlockerService) -> None:
 def run_cli(service: WebsiteBlockerService | None = None) -> None:
     svc = service if service is not None else get_default_service()
 
-    # Inform user about root/admin requirements if targeting system hosts
     if svc.hosts_path == Path("/etc/hosts") and os.geteuid() != 0:
         print("\n[NOTE] You are running without root privileges.")
         print("Viewing blocked domains works, but modifying /etc/hosts requires 'sudo'.")

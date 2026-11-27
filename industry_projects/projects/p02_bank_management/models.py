@@ -46,7 +46,7 @@ class Account(ABC):
 class SavingsAccount(Account):
     """Savings account enforcing a mandatory minimum balance requirement."""
 
-    minimum_balance_cents: int = 5000  # $50.00 minimum balance
+    minimum_balance_cents: int = 5000
 
     @property
     def account_type(self) -> str:
@@ -68,7 +68,7 @@ class SavingsAccount(Account):
 class CurrentAccount(Account):
     """Current (checking) account permitting overdraft up to a pre-approved limit."""
 
-    overdraft_limit_cents: int = 50000  # $500.00 overdraft allowance
+    overdraft_limit_cents: int = 50000
 
     @property
     def account_type(self) -> str:
@@ -92,7 +92,7 @@ class TransactionRecord:
     """Immutable ledger entry recording an account operation."""
 
     account_number: str
-    transaction_type: str  # DEPOSIT, WITHDRAWAL, TRANSFER_IN, TRANSFER_OUT
+    transaction_type: str
     amount_cents: int
     balance_after_cents: int
     timestamp: str
